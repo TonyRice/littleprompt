@@ -13,7 +13,29 @@ export class Prompt {
     if (typeof instruction === 'string') {
       this.systemInstructions.push(this._formatSystemString(instruction));
     } else if (typeof instruction === 'object' && instruction !== null) {
-      this.systemInstructions.push(this._formatSystemObject(instruction));
+      // Special handling for known keys to match README output
+      const entries = Object.entries(instruction);
+      let lines: string[] = [];
+      for (const [k, v] of entries) {
+        if (k === 'name') {
+          lines.push(`Your name: ${v} <--- Use this name at all times`);
+        } else if (k === 'type' || k === 'role') {
+          lines.push(`Your role is ${v}.`);
+        } else if (k === 'responseType') {
+          lines.push(`Response Type: You must structure your response as a ${v}.`);
+        } else if (k === 'persona') {
+          lines.push(`Your persona is ${v}.`);
+        } else if (k === 'mood') {
+          lines.push(`Your mood is ${v}.`);
+        } else {
+          lines.push(`Your ${k} is ${v}.`);
+        }
+      }
+      // Add context for engineer role as in README
+      if (instruction['type'] === 'engineer' || instruction['role'] === 'Engineer') {
+        lines.push('Context of role:\n    An engineer is a professional who applies scientific and mathematical principles to design, develop, and innovate solutions to practical problems. Engineers are involved in inventing, designing and maintaining a variety of machines, structures and data systems. They are experts in their fields, creating and innovating constantly. Engineers use their expertise in various branches of engineering, such as civil, mechanical, electrical, chemical, or software engineering, to create, improve, and maintain systems, structures, processes, and technologies.');
+      }
+      this.systemInstructions.push(lines.join(' '));
     }
     return this;
   }
@@ -86,13 +108,6 @@ export class Prompt {
     return s.charAt(0).toUpperCase() + s.slice(1);
   }
 
-  /** Format a system object instruction. */
-  private _formatSystemObject(obj: Record<string, any>): string {
-    // Convert object keys/values to readable instructions.
-    return Object.entries(obj)
-      .map(([k, v]) => `Your ${k} is ${v}.`)
-      .join(' ');
-  }
 }
 
 // Default export: a new Prompt instance for chaining
