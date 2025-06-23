@@ -1,6 +1,6 @@
 {
   "name": "littleprompt",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A tiny, chainable TypeScript/Node.js library for building effective and structured prompts.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,7 +14,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc --project tsconfig.cjs.json && copy dist\\index.js dist\\index.cjs",
     "test": "jest",
     "clean": "rimraf dist",
     "typecheck": "tsc --noEmit"
